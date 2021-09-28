@@ -2,6 +2,8 @@
 
 通用PCM数据转wav文件生成器
 
+![image-20210929014939246](README.image/image-20210929014939246.png)
+
 ## 原始数据发送模块
 
 依赖两个文件：`Audio_Debug.c`和`Audio_Debug.h`
