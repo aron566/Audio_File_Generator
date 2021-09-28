@@ -11,6 +11,9 @@ CONFIG += c++11
 # 串口操作
 include(serial_opt/serial_opt.pri)
 
+# wav文件操作
+include(wav_opt/wav_opt.pri)
+
 SOURCES += \
     main.cpp \
     mainwindow.cpp

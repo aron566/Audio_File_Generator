@@ -107,10 +107,13 @@
           <bool>true</bool>
          </property>
          <property name="inputMask">
-          <string>file1.wav</string>
+          <string/>
          </property>
          <property name="text">
-          <string>file1.wav</string>
+          <string>file.wav</string>
+         </property>
+         <property name="maxLength">
+          <number>32767</number>
          </property>
         </widget>
        </item>

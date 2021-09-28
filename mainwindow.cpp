@@ -30,6 +30,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     /*建立串口*/
     serial_obj_creator();
+
+    /*建立wav文件对象*/
+    wav_obj_creator();
 }
 
 MainWindow::~MainWindow()
@@ -37,6 +40,8 @@ MainWindow::~MainWindow()
     delete ui;
 
     delete serial_obj;
+
+    delete wav_obj;
 }
 
 /**
@@ -48,6 +53,17 @@ void MainWindow::serial_obj_creator()
 
     connect(serial_obj, &serial_opt::signal_scan_serial_port, this, &MainWindow::slot_scan_serial_port);
     serial_obj->scan_serial_port();
+
+    /*建立环形缓冲区*/
+    serial_obj->create_cq_buf(CircularQueue::CQ_BUF_4K);
+}
+
+/**
+ * @brief MainWindow::wav_obj_creator
+ */
+void MainWindow::wav_obj_creator()
+{
+    wav_obj = new wav_opt;
 }
 
 /**
@@ -86,6 +102,14 @@ void MainWindow::on_CONNECTpushButton_clicked()
         serial_obj->close();
         connect_dev_state = false;
     }
+    if(connect_dev_state)
+    {
+        ui->CONNECTpushButton->setText(QString(tr("断开连接")));
+    }
+    else
+    {
+        ui->CONNECTpushButton->setText(QString(tr("连接")));
+    }
 }
 
 /**
@@ -93,7 +117,7 @@ void MainWindow::on_CONNECTpushButton_clicked()
  */
 void MainWindow::on_OPEN_FILEpushButton_clicked()
 {
-
+    ui->FILE_NAMElineEdit->setText(wav_obj->open_file());
 }
 
 /**
@@ -101,7 +125,11 @@ void MainWindow::on_OPEN_FILEpushButton_clicked()
  */
 void MainWindow::on_STARTpushButton_clicked()
 {
-
+    quint16 nChannleNumber = ui->CHANNEL_NUMcomboBox->currentText().toUShort();
+    quint32 nSampleRate = ui->SAMPLERATEcomboBox->currentText().toUInt();
+    quint16 nBitsPerSample = ui->AUDIO_BITcomboBox->currentText().toUShort();
+    wav_obj->set_wav_info(nChannleNumber, nSampleRate, nBitsPerSample);
+    ui->STARTpushButton->setText(QString(tr("停止录制")));
 }
 
 /* ---------------------------- end of file ----------------------------------*/
