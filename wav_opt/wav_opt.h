@@ -78,21 +78,31 @@ public:
         char DATANAME[4];
         quint32 nDataLength;
     }WAVFILEHEADER_Typedef_t;
-signals:
 
+    bool run_state = false;
+signals:
+    void signal_write_complete();
 public:
     QString &open_file();
     void set_file_name(const QString &file_name_set);
-    void set_wav_info(quint16 nChannleNumber = 2, quint32 nSampleRate = 16000, quint16 nBitsPerSample = 16)
+    void set_wav_info(quint64 file_size_set, quint16 nChannleNumber = 2, quint32 nSampleRate = 16000, quint16 nBitsPerSample = 16)
     {
+        file_size = file_size_set < 44?44:file_size_set;
+
         Wave_Header.nChannleNumber = nChannleNumber;
         Wave_Header.nSampleRate = nSampleRate;
         Wave_Header.nBitsPerSample = nBitsPerSample;
 
         Wave_Header.nBytesPerSecond = nSampleRate * nChannleNumber * nBitsPerSample / 8;
         Wave_Header.nBytesPerSample = nChannleNumber * nBitsPerSample / 8;
+
+        /*定位至文件写入区域*/
+        file_obj.seek(44);
+
+        run_state = true;
     }
-    void write_file_data(const uint8_t *data);
+    void write_file_data(const uint8_t *data, uint32_t len);
+    void stop_write();
 private:
     WAVFILEHEADER_Typedef_t Wave_Header =
     {
@@ -111,7 +121,8 @@ private:
         .nDataLength = 0,
     };
     QString file_name;
-    qint64 file_size;
+    quint64 file_size = 44;
+    quint64 current_file_size = 44;
     QFile file_obj;        /**< 文件对象*/
 };
 

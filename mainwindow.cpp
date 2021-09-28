@@ -10,7 +10,7 @@
 /* Header includes -----------------------------------------------------------*/
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include <QMessageBox>
 /* Macro definitions ---------------------------------------------------------*/
 #define PC_SOFTWARE_VERSION         "v1.0"
 /* Type definitions ----------------------------------------------------------*/
@@ -24,6 +24,17 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    /* Apply style sheet */
+    QFile file(":/qdarkstyle/dark/style.qss");
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        this->setStyleSheet(file.readAll());
+        file.close();
+    }
+
+    /*装载字体*/
+    font_file_load();
 
     /*设定软件标题*/
     this->setWindowTitle(tr("Audio File Generator Tool ")+tr(PC_SOFTWARE_VERSION));
@@ -45,17 +56,99 @@ MainWindow::~MainWindow()
 }
 
 /**
+ * @brief MainWindow::font_file_load
+ */
+void MainWindow::font_file_load()
+{
+    if(!fontDb.families().contains("FontAwesome"))
+    {
+        int fontId = fontDb.addApplicationFont(":/ico_ttf/fontawesome-webfont.ttf");
+        QStringList fontName = fontDb.applicationFontFamilies(fontId);
+        if(fontName.count() == 0)
+        {
+            qDebug() << "load fontawesome-webfont.ttf error";
+        }
+    }
+}
+
+/**
+ * @brief MainWindow::set_push_button_style
+ * @param font_size
+ */
+void MainWindow::set_push_button_style(int font_size)
+{
+    QFont menu_font;
+    if(fontDb.families().contains("FontAwesome"))
+    {
+        menu_font = QFont("FontAwesome");
+        menu_font.setHintingPreference(QFont::PreferNoHinting);
+    }
+    else
+    {
+        qDebug() << "the FontAwesome ttf file load faild.";
+        return;
+    }
+    menu_font.setPixelSize(font_size);
+
+    ui->CONNECTpushButton->setFont(menu_font);
+    if(connect_dev_state == false)
+    {
+        ui->CONNECTpushButton->setText(QString("%1%2").arg(QChar(0xf127)).arg(tr(" 连接设备")));
+        ui->CONNECTpushButton->setStyleSheet("color:white;");
+    }
+    else
+    {
+        ui->CONNECTpushButton->setText(QString("%1%2").arg(QChar(0xf0c1)).arg(tr(" 断开连接")));
+        ui->CONNECTpushButton->setStyleSheet("color:red;");
+    }
+
+    ui->STARTpushButton->setFont(menu_font);
+    ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 启动录制")));
+    ui->STARTpushButton->setStyleSheet("color:white;");
+}
+
+
+/**
+ * @brief MainWindow::resizeEvent
+ * @param event
+ */
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event)
+    QFont menu_font;
+    if(fontDb.families().contains("FontAwesome"))
+    {
+       menu_font = QFont("FontAwesome");
+       menu_font.setHintingPreference(QFont::PreferNoHinting);
+    }
+    else
+    {
+       qDebug() << "the FontAwesome ttf file load faild.";
+       return;
+    }
+
+    if(window()->width() >= 1600 && window()->height() >= 900)
+    {
+       set_push_button_style(18);
+    }
+    else
+    {
+       set_push_button_style(16);
+    }
+}
+
+/**
  * @brief MainWindow::serial_obj_creator
  */
 void MainWindow::serial_obj_creator()
 {
     serial_obj = new serial_opt(QString("com1"));
-
+    connect(serial_obj, &serial_opt::signal_read_serial_data, this, &MainWindow::slot_read_serial_data);
     connect(serial_obj, &serial_opt::signal_scan_serial_port, this, &MainWindow::slot_scan_serial_port);
     serial_obj->scan_serial_port();
 
     /*建立环形缓冲区*/
-    serial_obj->create_cq_buf(CircularQueue::CQ_BUF_4K);
+//    serial_obj->create_cq_buf(CircularQueue::CQ_BUF_4K);
 }
 
 /**
@@ -64,6 +157,7 @@ void MainWindow::serial_obj_creator()
 void MainWindow::wav_obj_creator()
 {
     wav_obj = new wav_opt;
+    connect(wav_obj, &wav_opt::signal_write_complete, this, &MainWindow::slot_write_complete);
 }
 
 /**
@@ -77,6 +171,28 @@ void MainWindow::slot_scan_serial_port(const QStringList &port_name_list)
    {
        ui->COM_LISTcomboBox->addItem(port_name_list.value(index));
    }
+}
+
+/**
+ * @brief MainWindow::slot_read_serial_data
+ * @param data
+ */
+void MainWindow::slot_read_serial_data(const QByteArray &data)
+{
+    if(wav_obj == nullptr)
+    {
+        return;
+    }
+    wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+}
+
+/**
+ * @brief MainWindow::slot_write_complete
+ */
+void MainWindow::slot_write_complete()
+{
+    QMessageBox message(QMessageBox::Information, tr("通知"), tr("<font size='10' color='green'>录音完成！</font>"), QMessageBox::Yes, nullptr);
+    message.exec();
 }
 
 /**
@@ -102,13 +218,15 @@ void MainWindow::on_CONNECTpushButton_clicked()
         serial_obj->close();
         connect_dev_state = false;
     }
-    if(connect_dev_state)
+    if(connect_dev_state == false)
     {
-        ui->CONNECTpushButton->setText(QString(tr("断开连接")));
+        ui->CONNECTpushButton->setText(QString("%1%2").arg(QChar(0xf127)).arg(tr(" 连接设备")));
+        ui->CONNECTpushButton->setStyleSheet("color:white;");
     }
     else
     {
-        ui->CONNECTpushButton->setText(QString(tr("连接")));
+        ui->CONNECTpushButton->setText(QString("%1%2").arg(QChar(0xf0c1)).arg(tr(" 断开连接")));
+        ui->CONNECTpushButton->setStyleSheet("color:red;");
     }
 }
 
@@ -125,11 +243,22 @@ void MainWindow::on_OPEN_FILEpushButton_clicked()
  */
 void MainWindow::on_STARTpushButton_clicked()
 {
-    quint16 nChannleNumber = ui->CHANNEL_NUMcomboBox->currentText().toUShort();
-    quint32 nSampleRate = ui->SAMPLERATEcomboBox->currentText().toUInt();
-    quint16 nBitsPerSample = ui->AUDIO_BITcomboBox->currentText().toUShort();
-    wav_obj->set_wav_info(nChannleNumber, nSampleRate, nBitsPerSample);
-    ui->STARTpushButton->setText(QString(tr("停止录制")));
+    if(wav_obj->run_state == false)
+    {
+        quint16 nChannleNumber = ui->CHANNEL_NUMcomboBox->currentText().toUShort();
+        quint32 nSampleRate = ui->SAMPLERATEcomboBox->currentText().toUInt();
+        quint16 nBitsPerSample = ui->AUDIO_BITcomboBox->currentText().toUShort();
+        quint64 file_size = ui->FILE_SIZElineEdit->text().toULongLong();
+        wav_obj->set_wav_info(file_size, nChannleNumber, nSampleRate, nBitsPerSample);
+        ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 停止录制")));
+        ui->STARTpushButton->setStyleSheet("color:red;");
+    }
+    else
+    {
+        wav_obj->stop_write();
+        ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 启动录制")));
+        ui->STARTpushButton->setStyleSheet("color:white;");
+    }
 }
 
 /* ---------------------------- end of file ----------------------------------*/

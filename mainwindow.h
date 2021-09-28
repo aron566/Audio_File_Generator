@@ -20,6 +20,7 @@
 #include <string.h>
 /** Private includes ---------------------------------------------------------*/
 #include <QMainWindow>
+#include <QFontDatabase>
 #include <serial_opt/serial_opt.h>
 #include <wav_opt/wav_opt.h>
 /** Private defines ----------------------------------------------------------*/
@@ -43,7 +44,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+signals:
+    void signal_write_file_data(const uint8_t *data, uint32_t len);
 private:
     Ui::MainWindow *ui;
 
@@ -51,16 +53,37 @@ public:
     serial_opt *serial_obj = nullptr;
 
     wav_opt *wav_obj = nullptr;
+
 private:
+    QFontDatabase fontDb;
+private:
+    void font_file_load();
+
+    void set_push_button_style(int font_size);
+
     void serial_obj_creator();
 
     void wav_obj_creator();
+private:
+    /*重新绘制界面字体大小*/
+    virtual void resizeEvent(QResizeEvent *event) override;
 private slots:
     /**
      * @brief slot_scan_serial_port
      * @param port_name_list
      */
     void slot_scan_serial_port(const QStringList &port_name_list);
+
+    /**
+     * @brief slot_read_serial_data
+     * @param data
+     */
+    void slot_read_serial_data(const QByteArray &data);
+
+    /**
+     * @brief slot_write_complete
+     */
+    void slot_write_complete();
 
     /**
      * @brief on_SCANpushButton_clicked

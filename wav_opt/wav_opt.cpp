@@ -68,6 +68,7 @@ void wav_opt::set_file_name(const QString &file_name_set)
     {
         file_name.clear();
         qDebug() << "set save wav file name error.";
+        return;
     }
 }
 
@@ -75,8 +76,45 @@ void wav_opt::set_file_name(const QString &file_name_set)
  * @brief wav_opt::write_file_data
  * @param data
  */
-void wav_opt::write_file_data(const uint8_t *data)
+void wav_opt::write_file_data(const uint8_t *data, uint32_t len)
 {
-
+    if(run_state == false)
+    {
+        return;
+    }
+    /*检测已写入文件大小*/
+    if(file_size > 44)
+    {
+        if((current_file_size+len) > file_size)
+        {
+            file_obj.write(reinterpret_cast<const char *>(data), file_size - current_file_size);
+            current_file_size = file_size;
+            emit signal_write_complete();
+            stop_write();
+        }
+    }
+    current_file_size += file_obj.write(reinterpret_cast<const char *>(data), len);
 }
+
+/**
+ * @brief wav_opt::stop_write
+ */
+void wav_opt::stop_write()
+{
+    run_state = false;
+    if(file_obj.isOpen() == false)
+    {
+        return;
+    }
+    file_size = current_file_size;
+
+    Wave_Header.nRiffLength = file_size - 8;
+    Wave_Header.nDataLength = file_size - 44;
+    file_obj.seek(0);
+    file_obj.write(reinterpret_cast<const char *>(&Wave_Header), 44);
+    file_obj.close();
+    current_file_size = 44;
+    file_size = 44;
+}
+
 /* ---------------------------- end of file ----------------------------------*/
