@@ -22,19 +22,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1" colspan="2">
-     <widget class="QLabel" name="TITLElabel">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;音频文件生成工具&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="2">
      <widget class="QGroupBox" name="AUDIOgroupBox">
       <property name="title">
@@ -270,17 +257,10 @@
        <string>通讯设置</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="COMlabel">
+       <item row="0" column="2">
+        <widget class="QPushButton" name="SCANpushButton">
          <property name="text">
-          <string>通讯端口</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="3">
-        <widget class="QPushButton" name="CONNECTpushButton">
-         <property name="text">
-          <string>连接</string>
+          <string>扫描</string>
          </property>
         </widget>
        </item>
@@ -298,13 +278,6 @@
            <string>COM1</string>
           </property>
          </item>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QPushButton" name="SCANpushButton">
-         <property name="text">
-          <string>扫描</string>
-         </property>
         </widget>
        </item>
        <item row="1" column="1">
@@ -334,7 +307,47 @@
          </property>
         </spacer>
        </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="COMlabel">
+         <property name="text">
+          <string>通讯端口</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="0" colspan="4">
+        <widget class="QPushButton" name="CONNECTpushButton">
+         <property name="text">
+          <string>连接</string>
+         </property>
+        </widget>
+       </item>
       </layout>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="3">
+     <widget class="QLabel" name="TITLElabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;音频文件生成工具&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
      </widget>
     </item>
    </layout>

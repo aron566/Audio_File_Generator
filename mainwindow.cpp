@@ -44,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     /*建立wav文件对象*/
     wav_obj_creator();
+
+    /*初始化定时器*/
+    timer_init();
 }
 
 MainWindow::~MainWindow()
@@ -53,6 +56,8 @@ MainWindow::~MainWindow()
     delete serial_obj;
 
     delete wav_obj;
+
+    delete timer;
 }
 
 /**
@@ -161,6 +166,16 @@ void MainWindow::wav_obj_creator()
 }
 
 /**
+ * @brief MainWindow::timer_init
+ */
+void MainWindow::timer_init()
+{
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &MainWindow::slot_timeout);
+    timer->setInterval(1);
+}
+
+/**
  * @brief MainWindow::slot_scan_serial_port
  * @param port_name_list
  */
@@ -183,7 +198,13 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
     {
         return;
     }
+    if(wav_obj->run_state == false)
+    {
+        return;
+    }
     wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+    ui->DATA_VIEWtextBrowser->append(QString(tr("Rec:")));
+    ui->DATA_VIEWtextBrowser->insertPlainText(data.toHex());
 }
 
 /**
@@ -191,8 +212,22 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
  */
 void MainWindow::slot_write_complete()
 {
+    ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 启动录制")));
+    ui->STARTpushButton->setStyleSheet("color:white;");
     QMessageBox message(QMessageBox::Information, tr("通知"), tr("<font size='10' color='green'>录音完成！</font>"), QMessageBox::Yes, nullptr);
     message.exec();
+}
+
+/**
+ * @brief MainWindow::slot_timeout
+ */
+void MainWindow::slot_timeout()
+{
+   if(wav_obj->run_state == false)
+   {
+       return;
+   }
+   ui->progressBar->setValue(wav_obj->current_file_size);
 }
 
 /**
@@ -235,6 +270,8 @@ void MainWindow::on_CONNECTpushButton_clicked()
  */
 void MainWindow::on_OPEN_FILEpushButton_clicked()
 {
+    wav_obj->run_state = false;
+    ui->progressBar->setValue(0);
     ui->FILE_NAMElineEdit->setText(wav_obj->open_file());
 }
 
@@ -249,16 +286,46 @@ void MainWindow::on_STARTpushButton_clicked()
         quint32 nSampleRate = ui->SAMPLERATEcomboBox->currentText().toUInt();
         quint16 nBitsPerSample = ui->AUDIO_BITcomboBox->currentText().toUShort();
         quint64 file_size = ui->FILE_SIZElineEdit->text().toULongLong();
+        /*设置进度条*/
+        ui->progressBar->setMaximum(file_size == 0?0xFFFF:file_size);
+
+        if(ui->FILE_NAMElineEdit->text() != wav_obj->file_name)
+        {
+            wav_obj->set_file_name(ui->FILE_NAMElineEdit->text());
+        }
         wav_obj->set_wav_info(file_size, nChannleNumber, nSampleRate, nBitsPerSample);
         ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 停止录制")));
         ui->STARTpushButton->setStyleSheet("color:red;");
+        ui->DATA_VIEWtextBrowser->clear();
+        ui->DATA_VIEWtextBrowser->clearHistory();
+
+        timer->start();
     }
     else
     {
         wav_obj->stop_write();
         ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 启动录制")));
         ui->STARTpushButton->setStyleSheet("color:white;");
+
+        timer->stop();
     }
 }
 
+/**
+ * @brief MainWindow::on_BOUDRATEcomboBox_currentTextChanged
+ * @param arg1
+ */
+void MainWindow::on_BOUDRATEcomboBox_currentTextChanged(const QString &arg1)
+{
+    serial_obj->set_baud_rate(static_cast<QSerialPort::BaudRate>(arg1.toInt()));
+}
+
+/**
+ * @brief MainWindow::on_COM_LISTcomboBox_currentTextChanged
+ * @param arg1
+ */
+void MainWindow::on_COM_LISTcomboBox_currentTextChanged(const QString &arg1)
+{
+    serial_obj->set_port_name(arg1);
+}
 /* ---------------------------- end of file ----------------------------------*/

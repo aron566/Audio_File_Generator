@@ -80,8 +80,13 @@ public:
     }WAVFILEHEADER_Typedef_t;
 
     bool run_state = false;
+    quint64 file_size = 44;
+    quint64 current_file_size = 44;
+    QString file_name;
 signals:
     void signal_write_complete();
+
+    void signal_current_progress();
 public:
     QString &open_file();
     void set_file_name(const QString &file_name_set);
@@ -109,7 +114,7 @@ private:
         .RiffName = {'R','I','F','F'},
         .nRiffLength = 44,
         .WavName = {'W', 'A', 'V', 'E'},
-        .FmtName = {'f', 'm', 't', '\0'},
+        .FmtName = {'f', 'm', 't', ' '},
         .nFmtLength = 16,
         .nAudioFormat = 1,
         .nChannleNumber = 2,
@@ -120,9 +125,7 @@ private:
         .DATANAME = {'d', 'a', 't', 'a'},
         .nDataLength = 0,
     };
-    QString file_name;
-    quint64 file_size = 44;
-    quint64 current_file_size = 44;
+
     QFile file_obj;        /**< 文件对象*/
 };
 

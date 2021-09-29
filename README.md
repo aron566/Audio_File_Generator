@@ -6,7 +6,7 @@
 
 ## 原始数据发送模块
 
-依赖两个文件：`Audio_Debug.c`和`Audio_Debug.h`
+依赖两个文件：`Audio_Debug.c`，`CircularQueue.c`，源码位于：MUC_Code目录下
 
 ```c
 /**                                                                             

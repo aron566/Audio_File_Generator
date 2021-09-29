@@ -21,6 +21,7 @@
 /** Private includes ---------------------------------------------------------*/
 #include <QMainWindow>
 #include <QFontDatabase>
+#include <QTimer>
 #include <serial_opt/serial_opt.h>
 #include <wav_opt/wav_opt.h>
 /** Private defines ----------------------------------------------------------*/
@@ -54,6 +55,7 @@ public:
 
     wav_opt *wav_obj = nullptr;
 
+    QTimer *timer = nullptr;
 private:
     QFontDatabase fontDb;
 private:
@@ -64,6 +66,8 @@ private:
     void serial_obj_creator();
 
     void wav_obj_creator();
+
+    void timer_init();
 private:
     /*重新绘制界面字体大小*/
     virtual void resizeEvent(QResizeEvent *event) override;
@@ -86,12 +90,21 @@ private slots:
     void slot_write_complete();
 
     /**
+     * @brief slot_timeout
+     */
+    void slot_timeout();
+
+    /**
      * @brief on_SCANpushButton_clicked
      */
     void on_SCANpushButton_clicked();
     void on_CONNECTpushButton_clicked();
     void on_OPEN_FILEpushButton_clicked();
     void on_STARTpushButton_clicked();
+
+    void on_BOUDRATEcomboBox_currentTextChanged(const QString &arg1);
+
+    void on_COM_LISTcomboBox_currentTextChanged(const QString &arg1);
 
 public:
     bool connect_dev_state = false;
