@@ -6,6 +6,8 @@
 
 ## 原始数据发送模块
 
+[demo工程](https://github.com/aron566/Audio_File_Generator_MCU_Code)
+
 依赖两个文件：`Audio_Debug.c`，`CircularQueue.c`，源码位于：MUC_Code目录下
 
 ```c
@@ -334,4 +336,10 @@ int main(void)
 ```
 
 ## 数据生成工具使用
+
+- 连接串口
+- 修改待保存音频文件名
+- 设置传输的通道数，即原始数据的格式
+- 设置文件大小，默认为0，则限制为65535大小，鼠标悬浮获得提示
+- 启动录制即可
 
