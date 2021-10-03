@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     font_file_load();
 
     /*设定软件标题*/
-    this->setWindowTitle(tr("Audio File Generator Tool By aron566")+tr(PC_SOFTWARE_VERSION));
+    this->setWindowTitle(tr("Audio File Generator Tool ")+tr(PC_SOFTWARE_VERSION)+tr(" By aron566"));
 
     /*建立串口*/
     serial_obj_creator();
