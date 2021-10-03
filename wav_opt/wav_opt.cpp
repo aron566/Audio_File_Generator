@@ -85,12 +85,14 @@ void wav_opt::write_file_data(const uint8_t *data, uint32_t len)
     /*检测已写入文件大小*/
     if(file_size > 44)
     {
-        if((current_file_size+len) > file_size)
+        if((current_file_size+len) >= file_size)
         {
             file_obj.write(reinterpret_cast<const char *>(data), file_size - current_file_size);
             current_file_size = file_size;
-            emit signal_write_complete();
+            qDebug() << "end size" << current_file_size;
             stop_write();
+            emit signal_write_complete();
+            return;
         }
     }
     current_file_size += file_obj.write(reinterpret_cast<const char *>(data), len);

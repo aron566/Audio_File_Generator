@@ -102,6 +102,10 @@ public:
         Wave_Header.nBytesPerSample = nChannleNumber * nBitsPerSample / 8;
 
         /*定位至文件写入区域*/
+        if(file_obj.isOpen() == false)
+        {
+            file_obj.open(QIODevice::ReadWrite);
+        }
         file_obj.seek(44);
 
         run_state = true;

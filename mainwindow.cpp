@@ -212,6 +212,7 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
  */
 void MainWindow::slot_write_complete()
 {
+    ui->progressBar->setValue(ui->progressBar->maximum());
     ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 启动录制")));
     ui->STARTpushButton->setStyleSheet("color:white;");
     QMessageBox message(QMessageBox::Information, tr("通知"), tr("<font size='10' color='green'>录音完成！</font>"), QMessageBox::Yes, nullptr);
@@ -287,13 +288,13 @@ void MainWindow::on_STARTpushButton_clicked()
         quint16 nBitsPerSample = ui->AUDIO_BITcomboBox->currentText().toUShort();
         quint64 file_size = ui->FILE_SIZElineEdit->text().toULongLong();
         /*设置进度条*/
-        ui->progressBar->setMaximum(file_size == 0?0xFFFF:file_size);
-
+        ui->progressBar->setMaximum(file_size == 0?0xFFFF:file_size*1024);
+        qDebug() << "set size" << ui->progressBar->maximum();
         if(ui->FILE_NAMElineEdit->text() != wav_obj->file_name)
         {
             wav_obj->set_file_name(ui->FILE_NAMElineEdit->text());
         }
-        wav_obj->set_wav_info(file_size, nChannleNumber, nSampleRate, nBitsPerSample);
+        wav_obj->set_wav_info(file_size*1024, nChannleNumber, nSampleRate, nBitsPerSample);
         ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 停止录制")));
         ui->STARTpushButton->setStyleSheet("color:red;");
         ui->DATA_VIEWtextBrowser->clear();
