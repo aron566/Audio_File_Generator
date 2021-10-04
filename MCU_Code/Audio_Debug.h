@@ -21,7 +21,7 @@
 #include <limits.h> /**< need variable max value    */ 
 #include <stdarg.h>                         
 /** Private includes ---------------------------------------------------------*/
-#include "PDM_OD_Port.h"                                                                     
+#include "User_Main.h"                                                                     
 /** Use C compiler -----------------------------------------------------------*/
 #ifdef __cplusplus ///< use C compiler                                          
 extern "C" {                                                                  
@@ -60,8 +60,6 @@ void Audio_Debug_Init(uint16_t *Send_Buf, SEND_DATA_FUNC_PORT_Typedef_t Send_Dat
 bool Audio_Debug_Start(void);
 /*音频数据打包发送*/
 void Audio_Debug_Put_Data(const int16_t *Left_Audio_Data, const int16_t *Right_Audio_Data, uint8_t Channel_Number, ...);
-/*音频调试通道使能*/
-void Audio_Debug_Channel_Sel(AUDIO_DEBUG_CHANNEL_SEL_Typedef_t Ch_Sel);
 
 #ifdef __cplusplus ///<end extern c                                             
 }                                                                               

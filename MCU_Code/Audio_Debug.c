@@ -37,7 +37,7 @@ typedef struct
 }SEND_BUF_Typedef_t;
                                                      
 /** Private macros -----------------------------------------------------------*/
-#define AUDIO_DATA_BUF_SIZE (CHANNEL_NUMBER_MAX*AUDIO_DEBUG_FRAME_MONO_SIZE*2)/**< 环形缓冲区大小*/                                                                                 
+#define AUDIO_DATA_BUF_SIZE CQ_BUF_2KB//(CHANNEL_8_EN*AUDIO_DEBUG_FRAME_MONO_SIZE)/**< 环形缓冲区大小 取2K*/                                                                                 
 /** Private constants --------------------------------------------------------*/
 /** Public variables ---------------------------------------------------------*/
 /** Private variables --------------------------------------------------------*/
@@ -61,14 +61,6 @@ static SEND_BUF_Typedef_t Send_Region;
 *                                                                               
 ********************************************************************************
 */                                                                              
-                                                                                
-/** Public application code --------------------------------------------------*/
-/*******************************************************************************
-*                                                                               
-*       Public code                                                             
-*                                                                               
-********************************************************************************
-*/
 /**
   ******************************************************************
   * @brief   音频调试通道使能
@@ -79,13 +71,24 @@ static SEND_BUF_Typedef_t Send_Region;
   * @date    2021-09-28
   ******************************************************************
   */
-void Audio_Debug_Channel_Sel(AUDIO_DEBUG_CHANNEL_SEL_Typedef_t Ch_Sel)
+static void Audio_Debug_Channel_Set(AUDIO_DEBUG_CHANNEL_SEL_Typedef_t Ch_Sel)
 {
+  if(Current_Channel_Sel == Ch_Sel || Ch_Sel == CHANNEL_0_NONE)
+  {
+    return;
+  }
   Current_Channel_Sel = Ch_Sel;
   uint32_t Number = (uint32_t)Current_Channel_Sel > (uint32_t)CHANNEL_2_EN?(uint32_t)Current_Channel_Sel:(uint32_t)CHANNEL_2_EN;
   Current_Send_Size = Number * AUDIO_DEBUG_FRAME_MONO_SIZE;
   CQ_emptyData(&CQ_Audio_Data_Handle);
 }
+/** Public application code --------------------------------------------------*/
+/*******************************************************************************
+*                                                                               
+*       Public code                                                             
+*                                                                               
+********************************************************************************
+*/
 
 /**
   ******************************************************************
@@ -118,7 +121,7 @@ bool Audio_Debug_Start(void)
   * @brief   音频数据打包发送
   * @param   [in]Left_Audio_Data 左音频数据
   * @param   [in]Right_Audio_Data 右音频数据
-  * @param   [in]Channel_Number 通道总数
+  * @param   [in]Channel_Number 其他通道总数
   * @param   [in]... 其他通道数据
   * @return  None.
   * @author  aron566
@@ -128,11 +131,14 @@ bool Audio_Debug_Start(void)
   */
 void Audio_Debug_Put_Data(const int16_t *Left_Audio_Data, const int16_t *Right_Audio_Data, uint8_t Channel_Number, ...)
 {
-  int16_t Audio_Data[Channel_Number*AUDIO_DEBUG_FRAME_MONO_SIZE];
-  //int16_t Audio_Data[8*AUDIO_DEBUG_FRAME_MONO_SIZE];
+  int16_t Audio_Data[8*AUDIO_DEBUG_FRAME_MONO_SIZE];
+  
   va_list args;
   
   uint32_t index = 0;
+  /*更新当前通道*/
+  Audio_Debug_Channel_Set((AUDIO_DEBUG_CHANNEL_SEL_Typedef_t) Channel_Number);
+  
   for(uint32_t i = 0; i < AUDIO_DEBUG_FRAME_MONO_SIZE; i++)
   {
     switch(Current_Channel_Sel)
@@ -162,7 +168,7 @@ void Audio_Debug_Put_Data(const int16_t *Left_Audio_Data, const int16_t *Right_A
           Audio_Data[index++] = (va_arg(args, uint16_t *))[i];
         }
         break; 
-      }                          
+      }
       default:
         Audio_Data[index++] = 0;
         Audio_Data[index++] = 0;
@@ -170,7 +176,7 @@ void Audio_Debug_Put_Data(const int16_t *Left_Audio_Data, const int16_t *Right_A
     }
   }
   va_end(args);
-  CQ_16putData(&CQ_Audio_Data_Handle, (const uint16_t *)Audio_Data, AUDIO_DEBUG_FRAME_STEREO_SIZE);
+  CQ_16putData(&CQ_Audio_Data_Handle, (const uint16_t *)Audio_Data, (2 + Channel_Number) * AUDIO_DEBUG_FRAME_MONO_SIZE);
 }
 
 /**
