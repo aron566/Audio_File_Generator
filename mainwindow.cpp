@@ -318,7 +318,7 @@ void MainWindow::on_STARTpushButton_clicked()
  */
 void MainWindow::on_BOUDRATEcomboBox_currentTextChanged(const QString &arg1)
 {
-    serial_obj->set_baud_rate(static_cast<QSerialPort::BaudRate>(arg1.toInt()));
+    serial_obj->set_baud_rate(arg1.toInt());
 }
 
 /**

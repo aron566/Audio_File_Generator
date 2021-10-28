@@ -82,7 +82,7 @@ void serial_opt::set_port_name(const QString &port_name)
  * @brief serial_opt::set_baud_rate
  * @param baud_rate
  */
-void serial_opt::set_baud_rate(QSerialPort::BaudRate baud_rate)
+void serial_opt::set_baud_rate(qint32 baud_rate)
 {
     if(serial == nullptr)
     {

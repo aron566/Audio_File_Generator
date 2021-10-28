@@ -284,6 +284,11 @@
         <widget class="QComboBox" name="BOUDRATEcomboBox">
          <item>
           <property name="text">
+           <string>1500000</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>115200</string>
           </property>
          </item>

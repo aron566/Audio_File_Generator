@@ -80,7 +80,7 @@ public slots:
     void readyRead();
 public:
     void set_port_name(const QString &port_name);
-    void set_baud_rate(QSerialPort::BaudRate baud_rate = QSerialPort::Baud115200);
+    void set_baud_rate(qint32 baud_rate = QSerialPort::Baud115200);
     void set_data_bits(QSerialPort::DataBits data_bits = QSerialPort::Data8);
     void set_parity(QSerialPort::Parity parity = QSerialPort::NoParity);
     void set_stop_bits(QSerialPort::StopBits stop_bits = QSerialPort::OneStop);
