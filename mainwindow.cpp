@@ -248,6 +248,7 @@ void MainWindow::on_CONNECTpushButton_clicked()
     if(connect_dev_state == false)
     {
         serial_obj->set_port_name(ui->COM_LISTcomboBox->currentText());
+        serial_obj->set_baud_rate(ui->BOUDRATEcomboBox->currentText().toInt());
         connect_dev_state = serial_obj->open();
     }
     else
