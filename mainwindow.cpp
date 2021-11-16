@@ -12,7 +12,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 /* Macro definitions ---------------------------------------------------------*/
-#define PC_SOFTWARE_VERSION         "v1.1.2"
+#define PC_SOFTWARE_VERSION         "v1.1.3"
 /* Type definitions ----------------------------------------------------------*/
 /* Variable declarations -----------------------------------------------------*/
 /* Variable definitions ------------------------------------------------------*/
