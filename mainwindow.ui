@@ -89,14 +89,14 @@
        <item row="4" column="0">
         <widget class="QLabel" name="FILE_SIZElabel">
          <property name="text">
-          <string>文件大小限制</string>
+          <string>时长大小限制</string>
          </property>
         </widget>
        </item>
        <item row="4" column="1" colspan="3">
         <widget class="QLineEdit" name="FILE_SIZElineEdit">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;单位:KB,写0不进行限制&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;单位:s,写0默认值0xFFFF&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>0</string>

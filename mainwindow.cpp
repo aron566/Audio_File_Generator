@@ -12,7 +12,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 /* Macro definitions ---------------------------------------------------------*/
-#define PC_SOFTWARE_VERSION         "v1.0.1"
+#define PC_SOFTWARE_VERSION         "v1.1.2"
 /* Type definitions ----------------------------------------------------------*/
 /* Variable declarations -----------------------------------------------------*/
 /* Variable definitions ------------------------------------------------------*/
@@ -228,6 +228,7 @@ void MainWindow::slot_timeout()
    {
        return;
    }
+   qDebug() << "current_file_size:" << wav_obj->current_file_size <<"/" << ui->progressBar->maximum();
    ui->progressBar->setValue(wav_obj->current_file_size);
 }
 
@@ -286,15 +287,16 @@ void MainWindow::on_STARTpushButton_clicked()
         quint16 nChannleNumber = ui->CHANNEL_NUMcomboBox->currentText().toUShort();
         quint32 nSampleRate = ui->SAMPLERATEcomboBox->currentText().toUInt();
         quint16 nBitsPerSample = ui->AUDIO_BITcomboBox->currentText().toUShort();
-        quint64 file_size = ui->FILE_SIZElineEdit->text().toULongLong();
-        /*设置进度条*/
-        ui->progressBar->setMaximum(file_size == 0?0xFFFF:file_size*1024);
-        qDebug() << "set size" << ui->progressBar->maximum();
+        quint64 record_sec = ui->FILE_SIZElineEdit->text().toULongLong();
+        record_sec = record_sec < 1?0xFFFF:record_sec;
+        qDebug() << "set record sec:" << record_sec << "s";
         if(ui->FILE_NAMElineEdit->text() != wav_obj->file_name)
         {
             wav_obj->set_file_name(ui->FILE_NAMElineEdit->text());
         }
-        wav_obj->set_wav_info(file_size*1024, nChannleNumber, nSampleRate, nBitsPerSample);
+        wav_obj->set_wav_info(record_sec, nChannleNumber, nSampleRate, nBitsPerSample);
+        /*设置进度条*/
+        ui->progressBar->setMaximum(wav_obj->file_size);
         ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 停止录制")));
         ui->STARTpushButton->setStyleSheet("color:red;");
         ui->DATA_VIEWtextBrowser->clear();

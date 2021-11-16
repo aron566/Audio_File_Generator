@@ -90,9 +90,10 @@ signals:
 public:
     QString &open_file();
     void set_file_name(const QString &file_name_set);
-    void set_wav_info(quint64 file_size_set, quint16 nChannleNumber = 2, quint32 nSampleRate = 16000, quint16 nBitsPerSample = 16)
+    void set_wav_info(quint64 record_sec, quint16 nChannleNumber = 2, quint32 nSampleRate = 16000, quint16 nBitsPerSample = 16)
     {
-        file_size = file_size_set < 44?44:file_size_set;
+        /* 设置该时长下文件大小 */
+        file_size = 44 + (record_sec * nChannleNumber * nSampleRate * (nBitsPerSample / 8));
 
         Wave_Header.nChannleNumber = nChannleNumber;
         Wave_Header.nSampleRate = nSampleRate;

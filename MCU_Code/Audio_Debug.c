@@ -32,6 +32,7 @@ extern "C" {
 typedef struct 
 {
   uint16_t *Send_Buf_Ptr;
+  uint32_t Send_Buf_Size;
   SEND_DATA_FUNC_PORT_Typedef_t Send_Audio_Data;
   GET_IDEL_STATE_PORT_Typedef_t Get_Idel_State;
 }SEND_BUF_Typedef_t;
@@ -111,8 +112,11 @@ bool Audio_Debug_Start(void)
   {
     return false;
   }
-  CQ_16getData(&CQ_Audio_Data_Handle, Send_Region.Send_Buf_Ptr, Current_Send_Size);
-  Send_Region.Send_Audio_Data((uint8_t *)Send_Region.Send_Buf_Ptr, Current_Send_Size * sizeof(int16_t));
+  
+  /* 依据buf大小取出数据 */
+  uint32_t Size = Current_Send_Size > Send_Region.Send_Buf_Size?Send_Region.Send_Buf_Size:Current_Send_Size;
+  CQ_16getData(&CQ_Audio_Data_Handle, Send_Region.Send_Buf_Ptr, Size);
+  Send_Region.Send_Audio_Data((uint8_t *)Send_Region.Send_Buf_Ptr, Size * sizeof(int16_t));
   return true;
 }
 
@@ -183,6 +187,7 @@ void Audio_Debug_Put_Data(const int16_t *Left_Audio_Data, const int16_t *Right_A
   ******************************************************************
   * @brief   音频调试初始化
   * @param   [in]Send_Buf.
+  * @param   [in]Buf_Szie 发送缓冲大小.
   * @param   [in]Send_Data_Func 发送数据接口.
   * @param   [in]Get_Idel_Func 获取空闲状态.
   * @return  None.
@@ -191,10 +196,11 @@ void Audio_Debug_Put_Data(const int16_t *Left_Audio_Data, const int16_t *Right_A
   * @date    2021-09-28
   ******************************************************************
   */
-void Audio_Debug_Init(uint16_t *Send_Buf, SEND_DATA_FUNC_PORT_Typedef_t Send_Data_Func, GET_IDEL_STATE_PORT_Typedef_t Get_Idel_Func)
+void Audio_Debug_Init(uint16_t *Send_Buf, uint32_t Buf_Size, SEND_DATA_FUNC_PORT_Typedef_t Send_Data_Func, GET_IDEL_STATE_PORT_Typedef_t Get_Idel_Func)
 {
   /*初始化发送区*/
   Send_Region.Send_Buf_Ptr = Send_Buf;
+  Send_Region.Send_Buf_Size = Buf_Size;
   Send_Region.Send_Audio_Data = Send_Data_Func;
   Send_Region.Get_Idel_State = Get_Idel_Func;
 

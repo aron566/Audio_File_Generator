@@ -21,7 +21,7 @@
 #include <limits.h> /**< need variable max value    */ 
 #include <stdarg.h>                         
 /** Private includes ---------------------------------------------------------*/
-#include "User_Main.h"                                                                     
+#include "PDM_OD_Port.h"                                                                     
 /** Use C compiler -----------------------------------------------------------*/
 #ifdef __cplusplus ///< use C compiler                                          
 extern "C" {                                                                  
@@ -55,7 +55,7 @@ typedef bool (*GET_IDEL_STATE_PORT_Typedef_t)(void);
 /** Exported functions prototypes --------------------------------------------*/
 
 /*音频调试初始化*/
-void Audio_Debug_Init(uint16_t *Send_Buf, SEND_DATA_FUNC_PORT_Typedef_t Send_Data_Func, GET_IDEL_STATE_PORT_Typedef_t Get_Idel_Func);
+void Audio_Debug_Init(uint16_t *Send_Buf, uint32_t Buf_Size, SEND_DATA_FUNC_PORT_Typedef_t Send_Data_Func, GET_IDEL_STATE_PORT_Typedef_t Get_Idel_Func);
 /*音频调试启动*/
 bool Audio_Debug_Start(void);
 /*音频数据打包发送*/
