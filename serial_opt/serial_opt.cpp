@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QCoreApplication>
+#include <QElapsedTimer>
 /* Macro definitions ---------------------------------------------------------*/
 #define DEBUG_SERIAL_PRINTF(str) qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << str
 /* Type definitions ----------------------------------------------------------*/
@@ -289,7 +290,7 @@ qint32 serial_opt::get_baud_rate()
  */
 void serial_opt::delay_ms(int ms)
 {
-    QTime t;
+    QElapsedTimer t;
     t.restart();
     while(t.elapsed() < ms)
     {
@@ -390,7 +391,7 @@ QString serial_opt::uint2hexstr(char num)
     QString hexstr = QString("%1").arg(num&0xFF, 2, 16, QLatin1Char('0'));
 #else
     QString hexstr;
-    hexstr.sprintf("%02X", num);
+    hexstr.asprintf("%02X", num);
 #endif
     return hexstr;
 }
