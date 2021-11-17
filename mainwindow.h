@@ -24,6 +24,7 @@
 #include <QTimer>
 #include <serial_opt/serial_opt.h>
 #include <wav_opt/wav_opt.h>
+#include <multichannel_protocol.h>
 /** Private defines ----------------------------------------------------------*/
 
 /** Exported typedefines -----------------------------------------------------*/
@@ -56,6 +57,8 @@ public:
     wav_opt *wav_obj = nullptr;
 
     QTimer *timer = nullptr;
+
+    MultiChannel_Protocol *protocol_obj = nullptr;
 private:
     QFontDatabase fontDb;
 private:
@@ -88,6 +91,13 @@ private slots:
      * @brief slot_write_complete
      */
     void slot_write_complete();
+
+    /**
+     * @brief slot_post_data
+     * @param data
+     * @param data_len
+     */
+    void slot_post_data(const quint8 *data, quint16 data_len);
 
     /**
      * @brief slot_timeout

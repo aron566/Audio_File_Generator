@@ -269,12 +269,45 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="BOUDRATElabel">
+       <item row="0" column="0">
+        <widget class="QLabel" name="COMlabel">
          <property name="text">
-          <string>波特率</string>
+          <string>通讯端口</string>
          </property>
         </widget>
+       </item>
+       <item row="3" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0" colspan="4">
+        <widget class="QPushButton" name="CONNECTpushButton">
+         <property name="text">
+          <string>连接</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="0" column="1">
         <widget class="QComboBox" name="COM_LISTcomboBox">
@@ -299,43 +332,17 @@
          </item>
         </widget>
        </item>
-       <item row="2" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="COMlabel">
+       <item row="1" column="0">
+        <widget class="QLabel" name="BOUDRATElabel">
          <property name="text">
-          <string>通讯端口</string>
+          <string>波特率</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="0" colspan="4">
-        <widget class="QPushButton" name="CONNECTpushButton">
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="CRC_checkBox">
          <property name="text">
-          <string>连接</string>
+          <string>使能数据校验</string>
          </property>
         </widget>
        </item>

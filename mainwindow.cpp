@@ -39,9 +39,6 @@ MainWindow::MainWindow(QWidget *parent)
     /*设定软件标题*/
     this->setWindowTitle(tr("Audio File Generator Tool ")+tr(PC_SOFTWARE_VERSION)+tr(" By aron566"));
 
-    /*建立串口*/
-    serial_obj_creator();
-
     /*建立wav文件对象*/
     wav_obj_creator();
 
@@ -152,8 +149,12 @@ void MainWindow::serial_obj_creator()
     connect(serial_obj, &serial_opt::signal_scan_serial_port, this, &MainWindow::slot_scan_serial_port);
     serial_obj->scan_serial_port();
 
-    /*建立环形缓冲区*/
-//    serial_obj->create_cq_buf(CircularQueue::CQ_BUF_4K);
+    /* 建立环形缓冲区 */
+    serial_obj->create_cq_buf(CircularQueue::CQ_BUF_1M);
+
+    /* 建立协议栈 */
+    protocol_obj = new MultiChannel_Protocol(serial_obj, serial_obj->CQ_Buf_Obj, wav_obj);
+    connect(protocol_obj, &MultiChannel_Protocol::signal_post_data, this, &MainWindow::slot_post_data);
 }
 
 /**
@@ -163,6 +164,9 @@ void MainWindow::wav_obj_creator()
 {
     wav_obj = new wav_opt;
     connect(wav_obj, &wav_opt::signal_write_complete, this, &MainWindow::slot_write_complete);
+
+    /*建立串口*/
+    serial_obj_creator();
 }
 
 /**
@@ -202,9 +206,29 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
     {
         return;
     }
-    wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+    
+    /* 数据校验开关检测 */
+    if(ui->CRC_checkBox->isChecked() == false)
+    {
+        wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+    }
     ui->DATA_VIEWtextBrowser->append(QString(tr("Rec:")));
     ui->DATA_VIEWtextBrowser->insertPlainText(data.toHex());
+}
+
+/**
+ * @brief MainWindow::slot_post_data
+ * @param data
+ * @param data_len
+ */
+void MainWindow::slot_post_data(const quint8 *data, quint16 data_len)
+{
+    /* 数据校验开关检测 */
+    if(ui->CRC_checkBox->isChecked() == false)
+    {
+        return;
+    }
+    wav_obj->write_file_data(data, data_len);
 }
 
 /**
@@ -212,6 +236,7 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
  */
 void MainWindow::slot_write_complete()
 {
+    protocol_obj->stop();
     ui->progressBar->setValue(ui->progressBar->maximum());
     ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 启动录制")));
     ui->STARTpushButton->setStyleSheet("color:white;");
@@ -228,7 +253,7 @@ void MainWindow::slot_timeout()
    {
        return;
    }
-   qDebug() << "current_file_size:" << wav_obj->current_file_size <<"/" << ui->progressBar->maximum();
+//   qDebug() << "current_file_size:" << wav_obj->current_file_size <<"/" << ui->progressBar->maximum();
    ui->progressBar->setValue(wav_obj->current_file_size);
 }
 
@@ -304,9 +329,17 @@ void MainWindow::on_STARTpushButton_clicked()
         ui->DATA_VIEWtextBrowser->clearHistory();
 
         timer->start();
+
+        /* 数据校验开关检测 */
+        if(ui->CRC_checkBox->isChecked() == true)
+        {
+            protocol_obj->run();
+        }
     }
     else
     {
+        protocol_obj->stop();
+
         wav_obj->stop_write();
         ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 启动录制")));
         ui->STARTpushButton->setStyleSheet("color:white;");

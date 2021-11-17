@@ -16,6 +16,7 @@
 /** Includes -----------------------------------------------------------------*/
 /* Private includes ----------------------------------------------------------*/
 #include "CircularQueue.h"
+#include <QDebug>
 #if USE_LINUX_SYSTEM
 #include <sys/types.h>
 #endif
@@ -429,8 +430,8 @@ uint32_t CircularQueue::CQ_ManualGetData(CQ_handleTypeDef *CircularQueue, uint8_
     len = GET_MIN(len, CircularQueue->entrance - CircularQueue->exit);
     /*原理雷同存入*/
     size = GET_MIN(len, CircularQueue->size - (CircularQueue->exit & (CircularQueue->size - 1)));
-    memcpy(targetBuf, CircularQueue->Buffer.data8Buffer + (CircularQueue->exit & (CircularQueue->size - 1)), size);
-    memcpy(targetBuf + size, CircularQueue->Buffer.data8Buffer, len - size);
+    memmove(targetBuf, CircularQueue->Buffer.data8Buffer + (CircularQueue->exit & (CircularQueue->size - 1)), size);
+    memmove(targetBuf + size, CircularQueue->Buffer.data8Buffer, len - size);
     
     return len;
 }
@@ -469,15 +470,16 @@ CircularQueue::CQ_handleTypeDef *CircularQueue::cb_create(uint32_t buffsize)
 {
     if (!IS_POWER_OF_2(buffsize))
     {
+        qDebug() << "not power 2";
         return nullptr;
     }
 	
     CQ_handleTypeDef *cb = new CQ_handleTypeDef;//(CQ_handleTypeDef *)calloc(1, sizeof(CQ_handleTypeDef));
     if(nullptr == cb)
 	{
+        qDebug() << "nullptr == cb";
         return nullptr;
 	}
-    buffsize = (buffsize <= 20480 ? buffsize : 2048);
 	cb->size = buffsize;
 	cb->exit = 0;
 	cb->entrance = 0;

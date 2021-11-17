@@ -14,6 +14,9 @@ include(serial_opt/serial_opt.pri)
 # wav文件操作
 include(wav_opt/wav_opt.pri)
 
+# 传输协议
+include(protocol_opt/multichannel_protocol.pri)
+
 SOURCES += \
     main.cpp \
     mainwindow.cpp
@@ -23,6 +26,10 @@ HEADERS += \
 
 FORMS += \
     mainwindow.ui
+
+INCLUDEPATH += serial_opt \
+               wav_opt \
+               protocol_opt
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
