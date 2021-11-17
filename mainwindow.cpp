@@ -33,17 +33,22 @@ MainWindow::MainWindow(QWidget *parent)
         file.close();
     }
 
-    /*装载字体*/
+    /* 装载字体 */
     font_file_load();
 
-    /*设定软件标题*/
+    /* 设定软件标题 */
     this->setWindowTitle(tr("Audio File Generator Tool ")+tr(PC_SOFTWARE_VERSION)+tr(" By aron566"));
 
-    /*建立wav文件对象*/
+    /* 建立wav文件对象 */
     wav_obj_creator();
 
-    /*初始化定时器*/
+    /* 初始化定时器 */
     timer_init();
+
+    /* 获取线程池 */
+    g_thread_pool = QThreadPool::globalInstance();
+    g_thread_pool->setExpiryTimeout(-1);
+    g_thread_pool->setMaxThreadCount(static_cast<qint32>(std::thread::hardware_concurrency()));
 }
 
 MainWindow::~MainWindow()
@@ -210,7 +215,8 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
     /* 数据校验开关检测 */
     if(ui->CRC_checkBox->isChecked() == false)
     {
-        wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+        wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()),\
+                                 static_cast<quint32>(data.size()));
     }
     ui->DATA_VIEWtextBrowser->append(QString(tr("Rec:")));
     ui->DATA_VIEWtextBrowser->insertPlainText(data.toHex());
@@ -254,7 +260,7 @@ void MainWindow::slot_timeout()
        return;
    }
 //   qDebug() << "current_file_size:" << wav_obj->current_file_size <<"/" << ui->progressBar->maximum();
-   ui->progressBar->setValue(wav_obj->current_file_size);
+   ui->progressBar->setValue(static_cast<int>(wav_obj->current_file_size));
 }
 
 /**
@@ -322,7 +328,7 @@ void MainWindow::on_STARTpushButton_clicked()
         }
         wav_obj->set_wav_info(record_sec, nChannleNumber, nSampleRate, nBitsPerSample);
         /*设置进度条*/
-        ui->progressBar->setMaximum(wav_obj->file_size);
+        ui->progressBar->setMaximum(static_cast<qint32>(wav_obj->file_size));
         ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 停止录制")));
         ui->STARTpushButton->setStyleSheet("color:red;");
         ui->DATA_VIEWtextBrowser->clear();
@@ -333,7 +339,8 @@ void MainWindow::on_STARTpushButton_clicked()
         /* 数据校验开关检测 */
         if(ui->CRC_checkBox->isChecked() == true)
         {
-            protocol_obj->run();
+//            protocol_obj->run();
+            g_thread_pool->start(protocol_obj, 0);
         }
     }
     else

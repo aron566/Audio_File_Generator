@@ -21,6 +21,7 @@
 /** Private includes ---------------------------------------------------------*/
 #include <QObject>
 #include <QTimer>
+#include <QRunnable>
 #include "CircularQueue.h"
 #include "crc.h"
 #include "serial_opt.h"
@@ -36,7 +37,7 @@
 /** Exported functions prototypes --------------------------------------------*/
 
 
-class MultiChannel_Protocol : public QObject
+class MultiChannel_Protocol : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
@@ -44,7 +45,7 @@ public:
 
     MultiChannel_Protocol(QObject *parent = nullptr, CircularQueue *CQ_Handle = nullptr, wav_opt *wav_obj = nullptr);
 
-    ~MultiChannel_Protocol()
+    ~MultiChannel_Protocol() override
     {
         delete timer;
     }
@@ -53,7 +54,7 @@ signals:
 private slots:
     void slot_timeout();
 public:
-    void run()
+    virtual void run() override
     {
         run_state = true;
         protocol_start();

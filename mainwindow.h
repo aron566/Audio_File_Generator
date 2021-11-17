@@ -22,6 +22,8 @@
 #include <QMainWindow>
 #include <QFontDatabase>
 #include <QTimer>
+#include <QThread>
+#include <QThreadPool>
 #include <serial_opt/serial_opt.h>
 #include <wav_opt/wav_opt.h>
 #include <multichannel_protocol.h>
@@ -45,7 +47,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 signals:
     void signal_write_file_data(const uint8_t *data, uint32_t len);
 private:
@@ -118,6 +120,7 @@ private slots:
 
 public:
     bool connect_dev_state = false;
+    QThreadPool *g_thread_pool = nullptr;
 };
 #endif // MAINWINDOW_H
 

@@ -68,7 +68,7 @@ void MultiChannel_Protocol::protocol_start()
     quint32 len = 0;
     while(run_state)
     {
-        QCoreApplication::processEvents();
+        //QCoreApplication::processEvents();
 
         len = CQ_Buf_Obj->CQ_getLength(CQ_Buf_Obj->get_cq_handle());
 
