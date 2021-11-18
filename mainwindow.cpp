@@ -159,7 +159,10 @@ void MainWindow::serial_obj_creator()
 
     /* 建立协议栈 */
     protocol_obj = new MultiChannel_Protocol(serial_obj, serial_obj->CQ_Buf_Obj, wav_obj);
-    connect(protocol_obj, &MultiChannel_Protocol::signal_post_data, this, &MainWindow::slot_post_data);
+    /* 禁止线程完成后执行析构对象 */
+    protocol_obj->setAutoDelete(false);
+//    connect(protocol_obj, &MultiChannel_Protocol::signal_post_data, this, &MainWindow::slot_post_data);
+    connect(protocol_obj, &MultiChannel_Protocol::signal_post_data, this, &MainWindow::slot_post_data, Qt::BlockingQueuedConnection);
 }
 
 /**
@@ -339,8 +342,8 @@ void MainWindow::on_STARTpushButton_clicked()
         /* 数据校验开关检测 */
         if(ui->CRC_checkBox->isChecked() == true)
         {
-//            protocol_obj->run();
             g_thread_pool->start(protocol_obj, 0);
+            qDebug() << "线程 run "<< g_thread_pool->activeThreadCount() << "from " << QThread::currentThreadId();
         }
     }
     else

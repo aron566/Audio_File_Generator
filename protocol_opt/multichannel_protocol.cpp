@@ -9,8 +9,9 @@
   */
 /* Header includes -----------------------------------------------------------*/
 #include "multichannel_protocol.h"
-#include <QDebug>
+
 #include <QCoreApplication>
+#include <QThread>
 /* Macro definitions ---------------------------------------------------------*/
 /*
            /-----------/-----------/-----------/-----------/-----------/
@@ -63,7 +64,7 @@ MultiChannel_Protocol::MultiChannel_Protocol(QObject *parent, CircularQueue *CQ_
 
 void MultiChannel_Protocol::protocol_start()
 {
-    qDebug() << "启动协议栈";
+    qDebug() << "启动协议栈 current " << QThread::currentThreadId();
     quint8 frame_buf[FRAME_TEMP_BUF_SIZE];
     quint32 len = 0;
     while(run_state)
@@ -107,32 +108,9 @@ void MultiChannel_Protocol::protocol_start()
         CQ_Buf_Obj->CQ_ManualOffsetInc(CQ_Buf_Obj->get_cq_handle(), frame_len);
 
         /* 发出数据 */
-        emit signal_post_data(frame_buf+FRAME_DATA_OFFSET, data_len);
+//        emit signal_post_data(frame_buf+FRAME_DATA_OFFSET, data_len);//<! 由于线程原因需加上连接参数Qt::BlockingQueuedConnection进行同步
+        wav_obj->write_file_data(frame_buf+FRAME_DATA_OFFSET, data_len);
     }
-
-//    while(run_state)
-//    {
-//        QCoreApplication::processEvents();
-
-//        quint32 len = CQ_Buf_Obj->CQ_getLength(CQ_Buf_Obj->get_cq_handle());
-
-//        /* 检测是否满足最小帧长 */
-//        if(len < FRAME_MIN_SIZE)
-//        {
-//            continue;
-//        }
-
-//        len = len >= CircularQueue::CQ_BUF_SIZE_ENUM_TypeDef::CQ_BUF_8K?CircularQueue::CQ_BUF_SIZE_ENUM_TypeDef::CQ_BUF_8K:len;
-
-//        CQ_Buf_Obj->CQ_ManualGetData(CQ_Buf_Obj->get_cq_handle(), frame_buf, len);
-
-//        /* 完成一帧解析 */
-//        CQ_Buf_Obj->CQ_ManualOffsetInc(CQ_Buf_Obj->get_cq_handle(), len);
-
-//        /* 发出数据 */
-//        wav_obj->write_file_data(frame_buf, len);
-//        emit signal_post_data(frame_buf, len);
-//    }
     qDebug() << "退出协议栈";
 }
 
@@ -150,9 +128,7 @@ void MultiChannel_Protocol::slot_timeout()
         CQ_Buf_Obj->CQ_emptyData(CQ_Buf_Obj->get_cq_handle());
         return;
     }
-
-    /* 运行协议栈 */
-//    protocol_start();
+//    qDebug() << "AT [main] timer current " << QThread::currentThreadId();
 }
 
 /* ---------------------------- end of file ----------------------------------*/

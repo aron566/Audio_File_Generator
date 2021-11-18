@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QRunnable>
+#include <QDebug>
 #include "CircularQueue.h"
 #include "crc.h"
 #include "serial_opt.h"
@@ -47,7 +48,7 @@ public:
 
     ~MultiChannel_Protocol() override
     {
-        delete timer;
+        qDebug() << "delete MultiChannel_Protocol obj";
     }
 signals:
     void signal_post_data(const quint8 *data, quint16 data_len);
