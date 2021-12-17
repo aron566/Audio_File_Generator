@@ -240,7 +240,7 @@ bool Audio_Debug_Start(void)
     
     uint32_t index = 0;
     /* 更新当前通道 */
-    Audio_Debug_Channel_Set((AUDIO_DEBUG_CHANNEL_SEL_Typedef_t) Channel_Number);
+    Audio_Debug_Channel_Set((AUDIO_DEBUG_CHANNEL_SEL_Typedef_t) (Channel_Number + 2));
     
     for(uint32_t i = 0; i < AUDIO_DEBUG_FRAME_MONO_SIZE; i++)
     {
