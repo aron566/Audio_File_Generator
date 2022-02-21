@@ -12,7 +12,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 /* Macro definitions ---------------------------------------------------------*/
-#define PC_SOFTWARE_VERSION         "v1.1.3"
+#define PC_SOFTWARE_VERSION         "v1.1.4"
 /* Type definitions ----------------------------------------------------------*/
 /* Variable declarations -----------------------------------------------------*/
 /* Variable definitions ------------------------------------------------------*/
@@ -206,11 +206,16 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
     {
         return;
     }
-    
+
     /* 数据校验开关检测 */
     if(ui->CRC_checkBox->isChecked() == false)
     {
-        wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()), data.size());
+        wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()), static_cast<uint32_t>(data.size()));
+    }
+    /* 数据视口开关检测 */
+    if(ui->DATA_VIEWcheckBox->isChecked() == false)
+    {
+      return;
     }
     ui->DATA_VIEWtextBrowser->append(QString(tr("Rec:")));
     ui->DATA_VIEWtextBrowser->insertPlainText(data.toHex());
@@ -254,7 +259,7 @@ void MainWindow::slot_timeout()
        return;
    }
 //   qDebug() << "current_file_size:" << wav_obj->current_file_size <<"/" << ui->progressBar->maximum();
-   ui->progressBar->setValue(wav_obj->current_file_size);
+   ui->progressBar->setValue(static_cast<int>(wav_obj->current_file_size));
 }
 
 /**
@@ -322,7 +327,7 @@ void MainWindow::on_STARTpushButton_clicked()
         }
         wav_obj->set_wav_info(record_sec, nChannleNumber, nSampleRate, nBitsPerSample);
         /*设置进度条*/
-        ui->progressBar->setMaximum(wav_obj->file_size);
+        ui->progressBar->setMaximum(static_cast<int>(wav_obj->file_size));
         ui->STARTpushButton->setText(QString("%1%2").arg(QChar(0xf016)).arg(tr(" 停止录制")));
         ui->STARTpushButton->setStyleSheet("color:red;");
         ui->DATA_VIEWtextBrowser->clear();

@@ -85,7 +85,8 @@ void MultiChannel_Protocol::protocol_start()
         }
 
         /* 获取数据长度 */
-        quint16 data_len = (static_cast<quint16>(CQ_Buf_Obj->CQ_ManualGet_Offset_Data(CQ_Buf_Obj->get_cq_handle(), 3)) << 8);
+        quint16 data_len = static_cast<quint16>(CQ_Buf_Obj->CQ_ManualGet_Offset_Data(CQ_Buf_Obj->get_cq_handle(), 3));
+        data_len <<= 8;
         data_len |= CQ_Buf_Obj->CQ_ManualGet_Offset_Data(CQ_Buf_Obj->get_cq_handle(), 2);
         quint16 frame_len = FRAME_SIZE_CALC(data_len);
         if(len < frame_len)
