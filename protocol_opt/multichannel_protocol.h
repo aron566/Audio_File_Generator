@@ -52,6 +52,11 @@ public:
     }
 signals:
     void signal_post_data(const quint8 *data, quint16 data_len);
+    /**
+     * @brief signal_post_error
+     * @param type 错误类型
+     */
+    void signal_post_error(quint8 type);
 private slots:
     void slot_timeout();
 public:

@@ -102,6 +102,12 @@ private slots:
     void slot_post_data(const quint8 *data, quint16 data_len);
 
     /**
+     * @brief slot_post_error
+     * @param type
+     */
+    void slot_post_error(quint8 type);
+
+    /**
      * @brief slot_timeout
      */
     void slot_timeout();

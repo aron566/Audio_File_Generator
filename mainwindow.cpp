@@ -12,7 +12,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 /* Macro definitions ---------------------------------------------------------*/
-#define PC_SOFTWARE_VERSION         "v1.1.3"
+#define PC_SOFTWARE_VERSION         "v1.1.4"
 /* Type definitions ----------------------------------------------------------*/
 /* Variable declarations -----------------------------------------------------*/
 /* Variable definitions ------------------------------------------------------*/
@@ -163,6 +163,7 @@ void MainWindow::serial_obj_creator()
     protocol_obj->setAutoDelete(false);
 //    connect(protocol_obj, &MultiChannel_Protocol::signal_post_data, this, &MainWindow::slot_post_data);
     connect(protocol_obj, &MultiChannel_Protocol::signal_post_data, this, &MainWindow::slot_post_data, Qt::BlockingQueuedConnection);
+    connect(protocol_obj, &MultiChannel_Protocol::signal_post_error, this, &MainWindow::slot_post_error);
 }
 
 /**
@@ -221,6 +222,13 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
         wav_obj->write_file_data(reinterpret_cast<const uint8_t *>(data.data()),\
                                  static_cast<quint32>(data.size()));
     }
+    /* 数据视口开关检测 */
+    if(ui->DATA_VIEWcheckBox->isChecked() == false)
+    {
+      return;
+    }
+    ui->DATA_VIEWtextBrowser->append(QString(tr("Rec:")));
+    ui->DATA_VIEWtextBrowser->insertPlainText(data.toHex());
     ui->DATA_VIEWtextBrowser->append(QString(tr("Rec:")));
     ui->DATA_VIEWtextBrowser->insertPlainText(data.toHex());
 }
@@ -251,6 +259,19 @@ void MainWindow::slot_write_complete()
     ui->STARTpushButton->setStyleSheet("color:white;");
     QMessageBox message(QMessageBox::Information, tr("通知"), tr("<font size='10' color='green'>录音完成！</font>"), QMessageBox::Yes, nullptr);
     message.exec();
+}
+
+/**
+ * @brief MainWindow::slot_post_error
+ * @param data
+ * @param data_len
+ */
+void MainWindow::slot_post_error(quint8 type)
+{
+  if(type == 0)
+  {
+    ui->statusbar->showMessage((QString(tr("crc err!"))), 500);
+  }
 }
 
 /**
