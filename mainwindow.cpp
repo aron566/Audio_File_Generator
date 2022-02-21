@@ -155,6 +155,7 @@ void MainWindow::serial_obj_creator()
     /* 建立协议栈 */
     protocol_obj = new MultiChannel_Protocol(serial_obj, serial_obj->CQ_Buf_Obj, wav_obj);
     connect(protocol_obj, &MultiChannel_Protocol::signal_post_data, this, &MainWindow::slot_post_data);
+    connect(protocol_obj, &MultiChannel_Protocol::signal_post_error, this, &MainWindow::slot_post_error);
 }
 
 /**
@@ -234,6 +235,19 @@ void MainWindow::slot_post_data(const quint8 *data, quint16 data_len)
         return;
     }
     wav_obj->write_file_data(data, data_len);
+}
+
+/**
+ * @brief MainWindow::slot_post_error
+ * @param data
+ * @param data_len
+ */
+void MainWindow::slot_post_error(quint8 type)
+{
+  if(type == 0)
+  {
+    ui->statusbar->showMessage((QString(tr("crc err!"))), 500);
+  }
 }
 
 /**

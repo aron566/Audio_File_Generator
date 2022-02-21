@@ -45,7 +45,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 signals:
     void signal_write_file_data(const uint8_t *data, uint32_t len);
 private:
@@ -98,6 +98,12 @@ private slots:
      * @param data_len
      */
     void slot_post_data(const quint8 *data, quint16 data_len);
+
+    /**
+     * @brief slot_post_error
+     * @param type
+     */
+    void slot_post_error(quint8 type);
 
     /**
      * @brief slot_timeout

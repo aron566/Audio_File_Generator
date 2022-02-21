@@ -101,6 +101,7 @@ void MultiChannel_Protocol::protocol_start()
             qDebug() << "crc error.";
             //serial_opt::debug_print(frame_buf, frame_len);
             CQ_Buf_Obj->CQ_ManualOffsetInc(CQ_Buf_Obj->get_cq_handle(), 1);
+            emit signal_post_error(0);
             continue;
         }
 
