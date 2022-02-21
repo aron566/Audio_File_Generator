@@ -214,7 +214,7 @@ void MainWindow::slot_read_serial_data(const QByteArray &data)
     {
         return;
     }
-    
+
     /* 数据校验开关检测 */
     if(ui->CRC_checkBox->isChecked() == false)
     {

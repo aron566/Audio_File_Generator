@@ -251,7 +251,11 @@
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
-        <widget class="QTextBrowser" name="DATA_VIEWtextBrowser"/>
+        <widget class="QTextBrowser" name="DATA_VIEWtextBrowser">
+         <property name="openLinks">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
