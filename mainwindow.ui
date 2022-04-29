@@ -223,6 +223,9 @@
        </item>
        <item row="6" column="0" colspan="6">
         <widget class="QPushButton" name="STARTpushButton">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <property name="text">
           <string>启动录制</string>
          </property>

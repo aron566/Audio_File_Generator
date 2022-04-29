@@ -210,7 +210,12 @@ void serial_opt::readyRead()
         if(have_cq_buf == true)
         {
 //            debug_print(reinterpret_cast<const uint8_t *>(read_data.data()), static_cast<uint32_t>(read_data.size()));
-            CircularQueue::CQ_putData(CQ_Buf_Obj->get_cq_handle(), reinterpret_cast<const uint8_t *>(read_data.data()), static_cast<uint32_t>(read_data.size()));
+          /* 剔除旧数据 */
+          if(CircularQueue::CQ_isFull(CQ_Buf_Obj->get_cq_handle()) == true)
+          {
+            CircularQueue::CQ_emptyData(CQ_Buf_Obj->get_cq_handle());
+          }
+          CircularQueue::CQ_putData(CQ_Buf_Obj->get_cq_handle(), reinterpret_cast<const uint8_t *>(read_data.data()), static_cast<uint32_t>(read_data.size()));
         }
         emit signal_read_serial_data(read_data);
     }

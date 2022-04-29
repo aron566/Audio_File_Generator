@@ -27,6 +27,7 @@
 #include "wav_opt.h"
 /** Private defines ----------------------------------------------------------*/
 
+#define FRAME_TEMP_BUF_SIZE (1024*8U)
 /** Exported typedefines -----------------------------------------------------*/
 
 /** Exported constants -------------------------------------------------------*/
@@ -75,7 +76,7 @@ public:
     crc crc_obj;
 private:
     bool run_state = false;
-
+    quint8 frame_buf[FRAME_TEMP_BUF_SIZE];
 };
 
 #endif // MULTICHANNEL_PROTOCOL_H
