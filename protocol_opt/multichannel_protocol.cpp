@@ -11,6 +11,7 @@
 #include "multichannel_protocol.h"
 #include <QDebug>
 #include <QCoreApplication>
+#include <QThread>
 /* Macro definitions ---------------------------------------------------------*/
 /*
            /-----------/-----------/-----------/-----------/-----------/
@@ -77,13 +78,13 @@ void MultiChannel_Protocol::protocol_start()
       /* 检测是否满足最小帧长 */
       if(len < FRAME_MIN_SIZE)
       {
-          continue;
+        continue;
       }
 
       /* 检测帧头 */
       if((len = CQ_Buf_Obj->CQ_skipInvaildModbusU16Header(CQ_Buf_Obj->get_cq_handle(), FRAME_HEADER)) < FRAME_MIN_SIZE)
       {
-          continue;
+        continue;
       }
 
       /* 获取数据长度 */
@@ -93,16 +94,24 @@ void MultiChannel_Protocol::protocol_start()
       quint16 frame_len = FRAME_SIZE_CALC(data_len);
       if(len < frame_len)
       {
-          continue;
+        continue;
       }
 
       /* 校验数据 */
+      if(frame_len > sizeof(frame_buf))
+      {
+        CQ_Buf_Obj->CQ_ManualOffsetInc(CQ_Buf_Obj->get_cq_handle(), 1);
+        continue;
+      }
+
       CQ_Buf_Obj->CQ_ManualGetData(CQ_Buf_Obj->get_cq_handle(), frame_buf, frame_len);
-      if(crc_obj.modbus_get_crc_result(frame_buf, frame_len-2) == false)
+      if(crc_obj.modbus_get_crc_result(frame_buf, frame_len - 2) == false)
       {
           qDebug() << "crc error.";
           //serial_opt::debug_print(frame_buf, frame_len);
+
           CQ_Buf_Obj->CQ_ManualOffsetInc(CQ_Buf_Obj->get_cq_handle(), 1);
+
           emit signal_post_error(0);
           continue;
       }
@@ -111,7 +120,7 @@ void MultiChannel_Protocol::protocol_start()
       CQ_Buf_Obj->CQ_ManualOffsetInc(CQ_Buf_Obj->get_cq_handle(), frame_len);
 
       /* 发出数据 */
-      emit signal_post_data(frame_buf+FRAME_DATA_OFFSET, data_len);
+      emit signal_post_data(frame_buf + FRAME_DATA_OFFSET, data_len);
   }
 
 //    while(run_state)
@@ -145,8 +154,7 @@ void MultiChannel_Protocol::protocol_start()
  */
 void MultiChannel_Protocol::slot_timeout()
 {
-    /* 运行协议栈 */
-//    protocol_start();
+
 }
 
 /* ---------------------------- end of file ----------------------------------*/

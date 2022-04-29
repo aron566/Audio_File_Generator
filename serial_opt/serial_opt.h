@@ -15,6 +15,10 @@
 /** Private includes ---------------------------------------------------------*/
 #include <QObject>
 #include <QTime>
+#include <QMutex>
+#include <QSemaphore>
+#include <QMutexLocker>
+
 #include <QtSerialPort/QSerialPort>         ///< 提供访问串口的功能
 #include <QtSerialPort/QSerialPortInfo>     ///< 提供系统中存在的串口的信息
 #include <serial_opt/CircularQueue.h>       ///< 环形缓冲区
@@ -112,6 +116,8 @@ private:
 public:
     CircularQueue *CQ_Buf_Obj = nullptr;/**< 可选建立环形缓冲区*/
     bool have_cq_buf = false;
+
+    static QSemaphore SerialSemaphore;
 protected:
     QStringList port_name_list;
     QByteArray read_data;

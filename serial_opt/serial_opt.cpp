@@ -19,6 +19,7 @@
 /* Type definitions ----------------------------------------------------------*/
 /* Variable declarations -----------------------------------------------------*/
 /* Variable definitions ------------------------------------------------------*/
+QSemaphore serial_opt::SerialSemaphore(1);
 /* Function declarations -----------------------------------------------------*/
 /* Function definitions ------------------------------------------------------*/
 /**
@@ -209,14 +210,18 @@ void serial_opt::readyRead()
         read_data = serial->readAll();
         if(have_cq_buf == true)
         {
+
 //            debug_print(reinterpret_cast<const uint8_t *>(read_data.data()), static_cast<uint32_t>(read_data.size()));
           /* 剔除旧数据 */
           if(CircularQueue::CQ_isFull(CQ_Buf_Obj->get_cq_handle()) == true)
           {
-            CircularQueue::CQ_emptyData(CQ_Buf_Obj->get_cq_handle());
+            SerialSemaphore.acquire();
+            CircularQueue::CQ_ManualOffsetInc(CQ_Buf_Obj->get_cq_handle(), static_cast<uint32_t>(read_data.size()));
+            SerialSemaphore.release();
           }
           CircularQueue::CQ_putData(CQ_Buf_Obj->get_cq_handle(), reinterpret_cast<const uint8_t *>(read_data.data()), static_cast<uint32_t>(read_data.size()));
         }
+
         emit signal_read_serial_data(read_data);
     }
 }
@@ -256,7 +261,7 @@ qint64 serial_opt::write(const char *data, qint64 len)
         message.exec();
         return 0;
     }
-    debug_print(reinterpret_cast<const uint8_t *>(data), len);
+    debug_print(reinterpret_cast<const uint8_t *>(data), static_cast<quint32>(len));
     return serial->write(data, len);
 }
 

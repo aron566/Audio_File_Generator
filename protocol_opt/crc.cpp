@@ -207,7 +207,7 @@ bool crc::modbus_get_crc_result(uint8_t *msg ,uint16_t len)
 {
     uint8_t CRC_value_L,CRC_value_H,CRC_value_L_temp,CRC_value_H_temp;
     uint16_t crc_ret = 0;
-    crc_ret = modbus_crc_return(msg, len);
+    crc_ret = modbus_crc_return_with_table(msg, len);
     CRC_value_L_temp = *(msg + len);
     CRC_value_H_temp = *(msg + len + 1);
     CRC_value_L = static_cast<uint8_t>((crc_ret &0x00FF));

@@ -9,7 +9,7 @@
   */
 /* Header includes -----------------------------------------------------------*/
 #include "wav_opt.h"
-
+#include <QCoreApplication>
 /* Macro definitions ---------------------------------------------------------*/
 /* Type definitions ----------------------------------------------------------*/
 /* Variable declarations -----------------------------------------------------*/
@@ -85,9 +85,9 @@ void wav_opt::write_file_data(const uint8_t *data, uint32_t len)
     /*检测已写入文件大小*/
     if(file_size > 44)
     {
-        if((current_file_size+len) >= file_size)
+        if((current_file_size + len) >= file_size)
         {
-            file_obj.write(reinterpret_cast<const char *>(data), file_size - current_file_size);
+            file_obj.write(reinterpret_cast<const char *>(data), static_cast<qint64>(file_size - current_file_size));
             current_file_size = file_size;
             qDebug() << "end size" << current_file_size;
             stop_write();
@@ -95,7 +95,15 @@ void wav_opt::write_file_data(const uint8_t *data, uint32_t len)
             return;
         }
     }
-    current_file_size += file_obj.write(reinterpret_cast<const char *>(data), len);
+    do{
+        QCoreApplication::processEvents();
+        if(file_obj.isWritable() == false)
+        {
+          qDebug() << "not write";
+          continue;
+        }
+        current_file_size += static_cast<quint64>(file_obj.write(reinterpret_cast<const char *>(data), len));
+    }while(0);
 }
 
 /**
@@ -110,8 +118,8 @@ void wav_opt::stop_write()
     }
     file_size = current_file_size;
 
-    Wave_Header.nRiffLength = file_size - 8;
-    Wave_Header.nDataLength = file_size - 44;
+    Wave_Header.nRiffLength = static_cast<quint32>(file_size - 8);
+    Wave_Header.nDataLength = static_cast<quint32>(file_size - 44);
     file_obj.seek(0);
     file_obj.write(reinterpret_cast<const char *>(&Wave_Header), 44);
     file_obj.close();
