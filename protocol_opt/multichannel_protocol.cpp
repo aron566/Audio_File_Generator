@@ -96,6 +96,12 @@ void MultiChannel_Protocol::protocol_start()
         }
 
         /* 校验数据 */
+        if(frame_len > sizeof(frame_buf))
+        {
+          CQ_Buf_Obj->CQ_ManualOffsetInc(CQ_Buf_Obj->get_cq_handle(), 1);
+          continue;
+        }
+
         CQ_Buf_Obj->CQ_ManualGetData(CQ_Buf_Obj->get_cq_handle(), frame_buf, frame_len);
         if(crc_obj.modbus_get_crc_result(frame_buf, frame_len-2) == false)
         {
